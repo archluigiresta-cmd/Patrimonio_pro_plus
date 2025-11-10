@@ -58,8 +58,53 @@ const ImmobiliScreen = () => {
       </div>
 
       <Modal title="Aggiungi Nuovo Immobile" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        {/* Form di aggiunta immobile */}
-        <p>Form per aggiungere un nuovo immobile.</p>
+        <form className="space-y-4">
+            <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome Immobile</label>
+                <input type="text" name="name" id="name" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Villa Paradiso" />
+            </div>
+            <div>
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Indirizzo</label>
+                <input type="text" name="address" id="address" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Via Roma 1, Milano" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Codice Identificativo</label>
+                    <input type="text" name="code" id="code" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="IMM-005" />
+                </div>
+                <div>
+                    <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
+                    <select id="type" name="type" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
+                        <option>Appartamento</option>
+                        <option>Villa</option>
+                        <option>Ufficio</option>
+                        <option>Terreno</option>
+                        <option>Garage</option>
+                    </select>
+                </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <div>
+                    <label htmlFor="surface" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Superficie (mq)</label>
+                    <input type="number" name="surface" id="surface" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                </div>
+                <div>
+                    <label htmlFor="rooms" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Numero Locali</label>
+                    <input type="number" name="rooms" id="rooms" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                </div>
+            </div>
+             <div>
+                <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Stato</label>
+                <select id="status" name="status" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
+                    <option>Libero</option>
+                    <option>Affittato</option>
+                </select>
+            </div>
+            <div className="flex justify-end gap-3 pt-4">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600">Annulla</button>
+                <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg shadow-sm hover:bg-primary-700">Aggiungi Immobile</button>
+            </div>
+        </form>
       </Modal>
     </div>
   );

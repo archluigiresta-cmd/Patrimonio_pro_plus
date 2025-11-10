@@ -20,14 +20,15 @@ const useRouter = () => {
         };
 
         window.addEventListener('hashchange', handleHashChange);
+        
+        // Inizializza il percorso se non è presente l'hash
+        if (window.location.hash === '') {
+            window.location.hash = '/';
+        }
+
         return () => window.removeEventListener('hashchange', handleHashChange);
     }, []);
     
-    // Inizializza il percorso se non è presente l'hash
-    if (window.location.hash === '') {
-        window.location.hash = '/';
-    }
-
     return { route };
 };
 

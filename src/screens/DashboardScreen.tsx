@@ -6,16 +6,19 @@ const DashboardScreen = () => {
     const totalProperties = properties.length;
     const rentedProperties = properties.filter(p => p.status === 'Affittato').length;
     const occupancyRate = totalProperties > 0 ? Math.round((rentedProperties / totalProperties) * 100) : 0;
-    const upcomingDeadlines = deadlines.filter(d => new Date(d.date) > new Date()).length;
+    const upcomingDeadlines = deadlines.filter(d => new Date(d.date) >= new Date()).length;
 
     const kpiData = [
-        { title: 'Entrate Mensili Stimate', value: '€ 4.200,00', icon: DollarSign, color: 'text-green-500' },
+        { title: 'Entrate Mensili Stimate', value: '€ 2.050,00', icon: DollarSign, color: 'text-green-500' },
         { title: 'Immobili Occupati', value: `${occupancyRate}%`, icon: Building, color: 'text-blue-500' },
         { title: 'Scadenze Prossime', value: upcomingDeadlines.toString(), icon: AlertTriangle, color: 'text-yellow-500' },
         { title: 'Task Completati', value: '1', icon: CheckCircle, color: 'text-purple-500' }
     ];
 
-    const sortedDeadlines = [...deadlines].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const sortedDeadlines = [...deadlines]
+        .filter(d => new Date(d.date) >= new Date())
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
     const sortedExpenses = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return (
