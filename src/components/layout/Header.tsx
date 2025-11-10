@@ -1,11 +1,10 @@
-import React from 'react';
 import { Menu, Search, Sun } from 'lucide-react';
 
 interface HeaderProps {
     toggleSidebar: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
+const Header = ({ toggleSidebar }: HeaderProps) => {
     return (
         <header className="flex items-center justify-between h-20 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300">

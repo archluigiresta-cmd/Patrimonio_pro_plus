@@ -1,7 +1,6 @@
-import React from 'react';
 import Card from '../components/ui/Card';
 
-const DashboardScreen: React.FC = () => {
+const DashboardScreen = () => {
     const summaryData = {
         totalValue: 850000,
         propertyCount: 5,
