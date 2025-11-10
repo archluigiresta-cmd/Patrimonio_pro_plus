@@ -1,16 +1,12 @@
 import { useState } from 'react';
-import { Plus, Edit, Trash2, Car } from 'lucide-react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import type { Vehicle } from '@/types';
 import Card from '@/components/ui/Card';
 import Modal from '@/components/ui/Modal';
-
-const mockVehicles: Vehicle[] = [
-    { id: 'vec-001', plate: 'AB123CD', model: 'Fiat 500', insuranceCompany: 'Allianz', insuranceExpiry: '2024-12-31', stampDutyAmount: 150, stampDutyExpiry: '2025-01-31', lastRevision: '2023-06-15', nextRevision: '2025-06-15' },
-    { id: 'vec-002', plate: 'XY456ZW', model: 'BMW X1', insuranceCompany: 'Generali', insuranceExpiry: '2025-05-20', stampDutyAmount: 250, stampDutyExpiry: '2025-04-30', lastRevision: '2024-03-10', nextRevision: '2026-03-10' },
-];
+import { vehicles as initialVehicles } from '@/data/store';
 
 const VeicoliScreen = () => {
-  const [vehicles, setVehicles] = useState(mockVehicles);
+  const [vehicles, setVehicles] = useState(initialVehicles);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getStatus = (dateString: string) => {

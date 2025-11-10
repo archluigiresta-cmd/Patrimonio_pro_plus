@@ -4,6 +4,10 @@ import Header from '@/components/layout/Header';
 import DashboardScreen from '@/screens/DashboardScreen';
 import ImmobiliScreen from '@/screens/ImmobiliScreen';
 import VeicoliScreen from '@/screens/VeicoliScreen';
+import InquiliniScreen from '@/screens/InquiliniScreen';
+import ContrattiScreen from '@/screens/ContrattiScreen';
+import SpeseScreen from '@/screens/SpeseScreen';
+import ScadenzeScreen from '@/screens/ScadenzeScreen';
 import PlaceholderScreen from '@/screens/PlaceholderScreen';
 
 // Semplice router lato client basato sull'hash
@@ -18,22 +22,17 @@ const useRouter = () => {
         window.addEventListener('hashchange', handleHashChange);
         return () => window.removeEventListener('hashchange', handleHashChange);
     }, []);
-
-    const navigate = (path: string) => {
-        window.location.hash = path;
-    };
     
     // Inizializza il percorso se non è presente l'hash
     if (window.location.hash === '') {
         window.location.hash = '/';
     }
 
-    return { route, navigate };
+    return { route };
 };
 
 
 const AppRouter = ({ route }: { route: string }) => {
-    // Estrae il titolo della pagina dal percorso per il placeholder
     const pageTitle = route.length > 1 ? route.charAt(1).toUpperCase() + route.slice(2) : 'Dashboard';
 
     switch (route) {
@@ -43,13 +42,16 @@ const AppRouter = ({ route }: { route: string }) => {
             return <ImmobiliScreen />;
         case '/veicoli':
             return <VeicoliScreen />;
-        // Aggiungi qui gli altri case per le nuove schermate
         case '/inquilini':
+            return <InquiliniScreen />;
         case '/contratti':
-        case '/pagamenti':
-        case '/scadenze':
-        case '/manutenzioni':
+            return <ContrattiScreen />;
         case '/spese':
+            return <SpeseScreen />;
+        case '/scadenze':
+            return <ScadenzeScreen />;
+        case '/pagamenti':
+        case '/manutenzioni':
         case '/documenti':
         case '/report':
         case '/analisi-finanziaria':

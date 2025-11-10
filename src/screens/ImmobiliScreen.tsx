@@ -2,12 +2,8 @@ import { useState } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import type { Property } from '@/types';
 import Card from '@/components/ui/Card';
-
-const mockProperties: Property[] = [
-  { id: 'imm-001', code: 'IMM-001', name: 'Villa Paradiso', address: 'Via Roma 1, Milano', type: 'Villa', surface: 250, rooms: 7, status: 'Affittato', imageUrl: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=2070&auto=format&fit=crop' },
-  { id: 'imm-002', code: 'IMM-002', name: 'Appartamento Centrale', address: 'Corso Buenos Aires 10, Milano', type: 'Appartamento', surface: 80, rooms: 3, status: 'Affittato', imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop' },
-  { id: 'imm-003', code: 'IMM-003', name: 'Ufficio Moderno', address: 'Piazza Duomo 5, Milano', type: 'Ufficio', surface: 120, rooms: 4, status: 'Libero', imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop' },
-];
+import Modal from '@/components/ui/Modal';
+import { properties as initialProperties } from '@/data/store';
 
 const PropertyCard = ({ property }: { property: Property }) => {
     const statusClass = property.status === 'Affittato' 
@@ -39,13 +35,15 @@ const PropertyCard = ({ property }: { property: Property }) => {
 };
 
 const ImmobiliScreen = () => {
-  const [properties, setProperties] = useState(mockProperties);
+  const [properties, setProperties] = useState(initialProperties);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="p-6 lg:p-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Elenco Immobili</h1>
         <button
+            onClick={() => setIsModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
         >
             <Plus size={16} />
@@ -58,6 +56,11 @@ const ImmobiliScreen = () => {
               <PropertyCard key={prop.id} property={prop} />
           ))}
       </div>
+
+      <Modal title="Aggiungi Nuovo Immobile" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        {/* Form di aggiunta immobile */}
+        <p>Form per aggiungere un nuovo immobile.</p>
+      </Modal>
     </div>
   );
 };
