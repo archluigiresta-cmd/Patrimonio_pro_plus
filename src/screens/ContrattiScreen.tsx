@@ -1,50 +1,43 @@
-import { contracts as initialContracts, properties, tenants } from '@/data/store';
-import InteractiveTable, { type Column } from '@/components/ui/InteractiveTable';
+import { useMemo } from 'react';
+import { Plus } from 'lucide-react';
 import type { Contract } from '@/types';
-import { Edit, FileText, Trash2 } from 'lucide-react';
+import InteractiveTable, { type Column } from '@/components/ui/InteractiveTable';
+import ExportButton from '@/components/ui/ExportButton';
+import { contracts as initialContracts, properties, tenants } from '@/data/store';
 
 const ContrattiScreen = () => {
-    const contracts = initialContracts.map(contract => ({
-        ...contract,
-        propertyName: properties.find(p => p.id === contract.propertyId)?.name || 'N/A',
-        tenantName: tenants.find(t => t.id === contract.tenantId)?.name || 'N/A'
-    }));
+    const contracts = useMemo(() => {
+        return initialContracts.map(contract => {
+            const property = properties.find(p => p.id === contract.propertyId);
+            const tenant = tenants.find(t => t.id === contract.tenantId);
+            return {
+                ...contract,
+                propertyName: property?.name || 'N/A',
+                tenantName: tenant?.name || 'N/A'
+            };
+        });
+    }, []);
 
     type ContractWithDetails = typeof contracts[0];
 
-    const columns: Column<ContractWithDetails>[] = [
-        { 
-            accessor: 'id', 
-            header: 'ID Contratto',
-            render: (item) => <span className="font-mono text-xs">{item.id}</span>
-        },
-        { accessor: 'propertyName', header: 'Immobile' },
-        { accessor: 'tenantName', header: 'Inquilino' },
-        {
-            accessor: 'startDate',
-            header: 'Periodo',
-            render: (item) => (
-                <span>
-                    {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
-                </span>
-            )
-        },
-        {
-            accessor: 'rentAmount',
-            header: 'Canone Mensile',
-            render: (item) => `€ ${item.rentAmount.toFixed(2)}`
-        },
-        {
-            accessor: 'id',
-            header: 'Azioni',
-            render: () => (
-                 <div className="flex gap-4">
-                    <button className="text-gray-400 hover:text-blue-500"><FileText size={18} /></button>
-                    <button className="text-gray-400 hover:text-primary-600"><Edit size={18} /></button>
-                    <button className="text-gray-400 hover:text-red-500"><Trash2 size={18} /></button>
-                </div>
-            )
+    const getStatus = (endDate: string) => {
+        const today = new Date();
+        const end = new Date(endDate);
+        if (end < today) {
+            return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300">Scaduto</span>;
         }
+        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Attivo</span>;
+    };
+    
+
+    const columns: Column<ContractWithDetails>[] = [
+        { accessor: 'id', header: 'ID Contratto', render: item => <span className="font-mono text-xs">{item.id}</span> },
+        { accessor: 'tenantName', header: 'Inquilino' },
+        { accessor: 'propertyName', header: 'Immobile' },
+        { accessor: 'startDate', header: 'Data Inizio', render: item => new Date(item.startDate).toLocaleDateString() },
+        { accessor: 'endDate', header: 'Data Fine', render: item => new Date(item.endDate).toLocaleDateString() },
+        { accessor: 'rentAmount', header: 'Canone Mensile', render: item => `€ ${item.rentAmount.toFixed(2)}` },
+        { accessor: 'endDate', header: 'Stato', render: item => getStatus(item.endDate) },
     ];
 
     return (
@@ -52,9 +45,17 @@ const ContrattiScreen = () => {
             <InteractiveTable
                 data={contracts}
                 columns={columns}
-                searchableColumn="propertyName"
+                searchableColumn="tenantName"
                 title="Elenco Contratti"
-            />
+            >
+                <ExportButton data={contracts} filename="contratti.csv" />
+                 <button
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                >
+                    <Plus size={16} />
+                    Aggiungi Contratto
+                </button>
+            </InteractiveTable>
         </div>
     );
 };

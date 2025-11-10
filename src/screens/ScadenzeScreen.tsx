@@ -1,56 +1,53 @@
-import { deadlines as initialDeadlines, properties } from '@/data/store';
-import InteractiveTable, { type Column } from '@/components/ui/InteractiveTable';
+import { useMemo } from 'react';
+import { Plus, AlertTriangle } from 'lucide-react';
 import type { Deadline } from '@/types';
-import { Edit, Trash2 } from 'lucide-react';
+import InteractiveTable, { type Column } from '@/components/ui/InteractiveTable';
+import ExportButton from '@/components/ui/ExportButton';
+import { deadlines as initialDeadlines, properties } from '@/data/store';
 
 const ScadenzeScreen = () => {
-    const deadlines = initialDeadlines.map(deadline => ({
-        ...deadline,
-        propertyName: properties.find(p => p.id === deadline.propertyId)?.name || 'N/A'
-    }));
+    const deadlines = useMemo(() => {
+        return initialDeadlines.map(deadline => {
+            const property = properties.find(p => p.id === deadline.propertyId);
+            return {
+                ...deadline,
+                propertyName: property?.name || 'N/A',
+            };
+        }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    }, []);
 
-    type DeadlineWithProperty = typeof deadlines[0];
+    type DeadlineWithDetails = typeof deadlines[0];
 
     const getStatus = (dateString: string) => {
-        if (!dateString) return { text: 'N/D', color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' };
         const today = new Date();
         today.setHours(0,0,0,0);
         const expiryDate = new Date(dateString);
         const diffTime = expiryDate.getTime() - today.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (diffDays < 0) return { text: 'Scaduto', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' };
-        if (diffDays <= 30) return { text: `In Scadenza`, color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' };
-        return { text: 'Attivo', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' };
+        if (diffDays < 0) return { text: 'Scaduto', color: 'text-red-500' };
+        if (diffDays <= 30) return { text: `In Scadenza (${diffDays} gg)`, color: 'text-yellow-500' };
+        return { text: 'Pianificato', color: 'text-green-500' };
     };
-
-    const columns: Column<DeadlineWithProperty>[] = [
-        { accessor: 'title', header: 'Oggetto' },
+    
+    const columns: Column<DeadlineWithDetails>[] = [
+        { accessor: 'title', header: 'Descrizione' },
         { accessor: 'propertyName', header: 'Immobile' },
         { accessor: 'type', header: 'Tipo' },
+        { accessor: 'date', header: 'Data Scadenza', render: item => new Date(item.date).toLocaleDateString() },
         { 
             accessor: 'date', 
-            header: 'Data Scadenza',
-            render: (item) => new Date(item.date).toLocaleDateString()
-        },
-        { 
-            accessor: 'id', 
-            header: 'Stato',
-            render: (item) => {
+            header: 'Stato', 
+            render: item => {
                 const status = getStatus(item.date);
-                return <span className={`px-2 py-1 text-xs font-semibold rounded-full ${status.color}`}>{status.text}</span>
+                return (
+                    <span className={`font-semibold ${status.color} flex items-center gap-1.5`}>
+                        {status.text !== 'Pianificato' && <AlertTriangle size={14} />}
+                        {status.text}
+                    </span>
+                )
             }
         },
-        {
-            accessor: 'id',
-            header: 'Azioni',
-            render: () => (
-                 <div className="flex gap-4">
-                    <button className="text-gray-400 hover:text-primary-600"><Edit size={18} /></button>
-                    <button className="text-gray-400 hover:text-red-500"><Trash2 size={18} /></button>
-                </div>
-            )
-        }
     ];
 
     return (
@@ -60,7 +57,15 @@ const ScadenzeScreen = () => {
                 columns={columns}
                 searchableColumn="title"
                 title="Elenco Scadenze"
-            />
+            >
+                <ExportButton data={deadlines} filename="scadenze.csv" />
+                <button
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                >
+                    <Plus size={16} />
+                    Aggiungi Scadenza
+                </button>
+            </InteractiveTable>
         </div>
     );
 };

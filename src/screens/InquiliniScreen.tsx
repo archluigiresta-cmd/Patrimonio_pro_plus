@@ -1,52 +1,38 @@
-import { tenants as initialTenants, properties } from '@/data/store';
-import InteractiveTable, { type Column } from '@/components/ui/InteractiveTable';
+import { useState, useMemo } from 'react';
+import { Plus } from 'lucide-react';
 import type { Tenant } from '@/types';
-import { Mail, Phone, Edit, Trash2 } from 'lucide-react';
+import InteractiveTable, { type Column } from '@/components/ui/InteractiveTable';
+import ExportButton from '@/components/ui/ExportButton';
+import { tenants as initialTenants, properties } from '@/data/store';
 
 const InquiliniScreen = () => {
-    const tenants = initialTenants.map(tenant => ({
-        ...tenant,
-        propertyName: properties.find(p => p.id === tenant.propertyId)?.name || 'N/A'
-    }));
+    const tenants = useMemo(() => {
+        return initialTenants.map(tenant => {
+            const property = properties.find(p => p.id === tenant.propertyId);
+            return {
+                ...tenant,
+                propertyName: property?.name || 'N/A',
+                propertyAddress: property?.address || 'N/A'
+            };
+        });
+    }, []);
 
     type TenantWithProperty = typeof tenants[0];
 
     const columns: Column<TenantWithProperty>[] = [
-        {
-            accessor: 'name',
-            header: 'Nome',
-            render: (item) => (
-                <div className="font-medium text-gray-900 dark:text-white">{item.name}</div>
-            )
-        },
-        {
-            accessor: 'email',
-            header: 'Contatti',
-            render: (item) => (
-                <div>
-                    <div className="flex items-center gap-2 text-sm">
-                        <Mail size={14} className="text-gray-400"/> {item.email}
-                    </div>
-                     <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Phone size={14} className="text-gray-400"/> {item.phone}
-                    </div>
-                </div>
-            )
-        },
+        { accessor: 'name', header: 'Nome' },
+        { accessor: 'email', header: 'Email' },
+        { accessor: 'phone', header: 'Telefono' },
         {
             accessor: 'propertyName',
-            header: 'Immobile Affittato'
-        },
-        {
-            accessor: 'id',
-            header: 'Azioni',
-            render: () => (
-                <div className="flex gap-4">
-                    <button className="text-gray-400 hover:text-primary-600"><Edit size={18} /></button>
-                    <button className="text-gray-400 hover:text-red-500"><Trash2 size={18} /></button>
+            header: 'Immobile Affittato',
+            render: (item) => (
+                <div>
+                    <p className="font-medium text-gray-800 dark:text-white">{item.propertyName}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{item.propertyAddress}</p>
                 </div>
             )
-        }
+        },
     ];
 
     return (
@@ -56,7 +42,15 @@ const InquiliniScreen = () => {
                 columns={columns}
                 searchableColumn="name"
                 title="Elenco Inquilini"
-            />
+            >
+                <ExportButton data={tenants} filename="inquilini.csv" />
+                <button
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                >
+                    <Plus size={16} />
+                    Aggiungi Inquilino
+                </button>
+            </InteractiveTable>
         </div>
     );
 };
