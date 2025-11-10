@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import { Search, ChevronsUpDown, Edit, Trash2 } from 'lucide-react';
 
 export interface Column<T> {
   accessor: keyof T;
   header: string;
-  render?: (item: T) => React.ReactNode;
+  render?: (item: T) => ReactNode;
 }
 
 interface InteractiveTableProps<T> {

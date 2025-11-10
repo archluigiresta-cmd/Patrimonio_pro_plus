@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Building2, LogOut } from 'lucide-react';
 import { SIDEBAR_NAV_ITEMS } from '../../constants';
 
@@ -6,7 +6,7 @@ interface SidebarProps {
   isCollapsed: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }) => {
+const Sidebar = ({ isCollapsed }: SidebarProps) => {
     const [activeId, setActiveId] = useState(() => {
         const currentPath = window.location.pathname;
         const activeItem = SIDEBAR_NAV_ITEMS.find(item => item.path === currentPath);

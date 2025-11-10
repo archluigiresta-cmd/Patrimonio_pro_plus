@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import InteractiveTable, { Column } from '../components/ui/InteractiveTable';
 import ExportButton from '../components/ui/ExportButton';
 import { Property } from '../types';
 
-const PropertiesScreen: React.FC = () => {
+const PropertiesScreen = () => {
   const [properties, setProperties] = useState<Property[]>([]);
 
   useEffect(() => {

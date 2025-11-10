@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import DashboardScreen from './screens/DashboardScreen';
 import PropertiesScreen from './screens/PropertiesScreen';
 
-const AppRouter: React.FC = () => {
+const AppRouter = () => {
     const [route, setRoute] = useState(window.location.pathname);
 
     useEffect(() => {
@@ -43,7 +43,7 @@ const AppRouter: React.FC = () => {
     }
 }
 
-const App: React.FC = () => {
+const App = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => {
