@@ -1,11 +1,12 @@
 import type { LucideIcon } from 'lucide-react';
+import type { FC } from 'react';
 
 export type NavItemType = 'link' | 'button' | 'spacer';
 
 export interface NavItem {
   id: string;
   label: string;
-  icon: LucideIcon;
+  icon: LucideIcon | FC;
   path?: string;
   type: NavItemType;
 }
