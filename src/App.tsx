@@ -3,6 +3,7 @@ import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
 import DashboardScreen from '@/screens/DashboardScreen';
 import ImmobiliScreen from '@/screens/ImmobiliScreen';
+import VeicoliScreen from '@/screens/VeicoliScreen';
 import PlaceholderScreen from '@/screens/PlaceholderScreen';
 
 // Semplice router lato client basato sull'hash
@@ -32,13 +33,17 @@ const useRouter = () => {
 
 
 const AppRouter = ({ route }: { route: string }) => {
+    // Estrae il titolo della pagina dal percorso per il placeholder
+    const pageTitle = route.length > 1 ? route.charAt(1).toUpperCase() + route.slice(2) : 'Dashboard';
+
     switch (route) {
         case '/':
             return <DashboardScreen />;
         case '/immobili':
             return <ImmobiliScreen />;
-        // Aggiungi qui gli altri case per le nuove schermate
         case '/veicoli':
+            return <VeicoliScreen />;
+        // Aggiungi qui gli altri case per le nuove schermate
         case '/inquilini':
         case '/contratti':
         case '/pagamenti':
@@ -48,7 +53,9 @@ const AppRouter = ({ route }: { route: string }) => {
         case '/documenti':
         case '/report':
         case '/analisi-finanziaria':
-            return <PlaceholderScreen pageTitle={route.charAt(1).toUpperCase() + route.slice(2)} />;
+        case '/impostazioni':
+        case '/aiuto':
+            return <PlaceholderScreen pageTitle={pageTitle} />;
         default:
             return <DashboardScreen />;
     }
