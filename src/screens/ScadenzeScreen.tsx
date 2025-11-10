@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Modal from '@/components/ui/Modal';
 import { deadlines as initialDeadlines, properties, getPropertyById } from '@/data/store';
+import type { Deadline } from '@/types';
 
 const ScadenzeScreen = () => {
   const [deadlines, setDeadlines] = useState(initialDeadlines);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newDeadline, setNewDeadline] = useState<Omit<Deadline, 'id'>>({
+      title: '',
+      type: 'Tassa',
+      date: new Date().toISOString().split('T')[0],
+      propertyId: ''
+  });
   
   const getStatus = (dateString: string) => {
     const today = new Date();
@@ -18,6 +25,20 @@ const ScadenzeScreen = () => {
     if (diffDays < 0) return { text: 'Scaduto', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' };
     if (diffDays <= 7) return { text: 'Urgente', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' };
     return { text: 'In programma', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' };
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setNewDeadline(prev => ({...prev, [name]: value}));
+  }
+
+  const handleAddDeadline = (e: FormEvent) => {
+      e.preventDefault();
+      const newId = `dead-${(Math.random() * 1000).toFixed(0).padStart(3, '0')}`;
+      setDeadlines(prev => [...prev, { id: newId, ...newDeadline }].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+      setIsModalOpen(false);
+      // Reset form
+      setNewDeadline({ title: '', type: 'Tassa', date: new Date().toISOString().split('T')[0], propertyId: '' });
   };
 
   return (
@@ -77,14 +98,14 @@ const ScadenzeScreen = () => {
       </Card>
       
       <Modal title="Aggiungi Nuova Scadenza" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-         <form className="space-y-4">
+         <form onSubmit={handleAddDeadline} className="space-y-4">
             <div>
-                <label htmlFor="deadline-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Titolo Scadenza</label>
-                <input type="text" name="deadline-title" id="deadline-title" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Pagamento Rata IMU" />
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Titolo Scadenza</label>
+                <input type="text" name="title" id="title" value={newDeadline.title} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Pagamento Rata IMU" required/>
             </div>
              <div>
-                <label htmlFor="deadline-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
-                <select id="deadline-type" name="deadline-type" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
+                <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
+                <select id="type" name="type" value={newDeadline.type} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
                     <option>Tassa</option>
                     <option>Utenza</option>
                     <option>Manutenzione</option>
@@ -93,13 +114,13 @@ const ScadenzeScreen = () => {
                 </select>
             </div>
             <div>
-                <label htmlFor="deadline-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Scadenza</label>
-                <input type="date" name="deadline-date" id="deadline-date" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Scadenza</label>
+                <input type="date" name="date" id="date" value={newDeadline.date} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" required/>
             </div>
             <div>
-                <label htmlFor="deadline-property" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Immobile di Riferimento</label>
-                <select id="deadline-property" name="deadline-property" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
-                    <option>Nessuno</option>
+                <label htmlFor="propertyId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Immobile di Riferimento</label>
+                <select id="propertyId" name="propertyId" value={newDeadline.propertyId} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
+                    <option value="">Nessuno</option>
                     {properties.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
             </div>

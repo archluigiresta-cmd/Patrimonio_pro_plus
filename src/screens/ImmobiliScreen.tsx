@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import type { Property } from '@/types';
 import Card from '@/components/ui/Card';
@@ -37,6 +37,33 @@ const PropertyCard = ({ property }: { property: Property }) => {
 const ImmobiliScreen = () => {
   const [properties, setProperties] = useState(initialProperties);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newProperty, setNewProperty] = useState<Omit<Property, 'id'>>({
+      name: '',
+      address: '',
+      code: '',
+      type: 'Appartamento',
+      surface: 0,
+      rooms: 0,
+      status: 'Libero',
+      imageUrl: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop'
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setNewProperty(prev => ({ ...prev, [name]: name === 'surface' || name === 'rooms' ? parseInt(value) : value }));
+  };
+
+  const handleAddProperty = (e: FormEvent) => {
+      e.preventDefault();
+      const newId = `imm-${(Math.random() * 1000).toFixed(0).padStart(3, '0')}`;
+      setProperties(prev => [...prev, { id: newId, ...newProperty }]);
+      setIsModalOpen(false);
+      // Reset form
+      setNewProperty({
+          name: '', address: '', code: '', type: 'Appartamento', surface: 0, rooms: 0, status: 'Libero',
+          imageUrl: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop'
+      });
+  };
 
   return (
     <div className="p-6 lg:p-8">
@@ -58,23 +85,23 @@ const ImmobiliScreen = () => {
       </div>
 
       <Modal title="Aggiungi Nuovo Immobile" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <form className="space-y-4">
+        <form onSubmit={handleAddProperty} className="space-y-4">
             <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nome Immobile</label>
-                <input type="text" name="name" id="name" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Villa Paradiso" />
+                <input type="text" name="name" id="name" value={newProperty.name} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Villa Paradiso" required />
             </div>
             <div>
                 <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Indirizzo</label>
-                <input type="text" name="address" id="address" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Via Roma 1, Milano" />
+                <input type="text" name="address" id="address" value={newProperty.address} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Via Roma 1, Milano" required />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Codice Identificativo</label>
-                    <input type="text" name="code" id="code" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="IMM-005" />
+                    <input type="text" name="code" id="code" value={newProperty.code} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="IMM-005" />
                 </div>
                 <div>
                     <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tipo</label>
-                    <select id="type" name="type" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
+                    <select id="type" name="type" value={newProperty.type} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
                         <option>Appartamento</option>
                         <option>Villa</option>
                         <option>Ufficio</option>
@@ -86,16 +113,16 @@ const ImmobiliScreen = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div>
                     <label htmlFor="surface" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Superficie (mq)</label>
-                    <input type="number" name="surface" id="surface" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                    <input type="number" name="surface" id="surface" value={newProperty.surface} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" required />
                 </div>
                 <div>
                     <label htmlFor="rooms" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Numero Locali</label>
-                    <input type="number" name="rooms" id="rooms" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                    <input type="number" name="rooms" id="rooms" value={newProperty.rooms} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" required />
                 </div>
             </div>
              <div>
                 <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Stato</label>
-                <select id="status" name="status" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
+                <select id="status" name="status" value={newProperty.status} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
                     <option>Libero</option>
                     <option>Affittato</option>
                 </select>

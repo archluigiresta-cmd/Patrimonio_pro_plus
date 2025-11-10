@@ -1,12 +1,34 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Modal from '@/components/ui/Modal';
 import { expenses as initialExpenses, properties, getPropertyById } from '@/data/store';
+import type { Expense } from '@/types';
 
 const SpeseScreen = () => {
   const [expenses, setExpenses] = useState(initialExpenses);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newExpense, setNewExpense] = useState<Omit<Expense, 'id'>>({
+      title: '',
+      category: 'Tasse',
+      amount: 0,
+      date: new Date().toISOString().split('T')[0],
+      propertyId: ''
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setNewExpense(prev => ({...prev, [name]: name === 'amount' ? parseFloat(value) : value }));
+  }
+
+  const handleAddExpense = (e: FormEvent) => {
+      e.preventDefault();
+      const newId = `exp-${(Math.random() * 1000).toFixed(0).padStart(3, '0')}`;
+      setExpenses(prev => [...prev, { id: newId, ...newExpense }].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+      setIsModalOpen(false);
+      // Reset form
+      setNewExpense({ title: '', category: 'Tasse', amount: 0, date: new Date().toISOString().split('T')[0], propertyId: '' });
+  };
 
   return (
     <div className="p-6 lg:p-8">
@@ -62,14 +84,14 @@ const SpeseScreen = () => {
       </Card>
       
       <Modal title="Aggiungi Nuova Spesa" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <form className="space-y-4">
+        <form onSubmit={handleAddExpense} className="space-y-4">
             <div>
-                <label htmlFor="expense-title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrizione Spesa</label>
-                <input type="text" name="expense-title" id="expense-title" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Bolletta luce" />
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Descrizione Spesa</label>
+                <input type="text" name="title" id="title" value={newExpense.title} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Bolletta luce" required />
             </div>
             <div>
-                <label htmlFor="expense-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
-                <select id="expense-category" name="expense-category" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoria</label>
+                <select id="category" name="category" value={newExpense.category} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
                     <option>Tasse</option>
                     <option>Utenze</option>
                     <option>Condominio</option>
@@ -79,18 +101,18 @@ const SpeseScreen = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label htmlFor="expense-amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Importo (€)</label>
-                    <input type="number" name="expense-amount" id="expense-amount" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                    <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Importo (€)</label>
+                    <input type="number" name="amount" id="amount" value={newExpense.amount} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" required />
                 </div>
                 <div>
-                    <label htmlFor="expense-date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Data</label>
-                    <input type="date" name="expense-date" id="expense-date" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                    <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Data</label>
+                    <input type="date" name="date" id="date" value={newExpense.date} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" required />
                 </div>
             </div>
             <div>
-                <label htmlFor="expense-property" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Immobile di Riferimento</label>
-                <select id="expense-property" name="expense-property" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
-                    <option>Nessuno</option>
+                <label htmlFor="propertyId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Immobile di Riferimento</label>
+                <select id="propertyId" name="propertyId" value={newExpense.propertyId} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700">
+                    <option value="">Nessuno</option>
                     {properties.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
             </div>

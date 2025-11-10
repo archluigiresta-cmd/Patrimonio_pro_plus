@@ -2,7 +2,6 @@
 export default {
   content: [
     "./index.html",
-    "./index.vite.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',
