@@ -4,7 +4,7 @@ import type { Property, Tenant, Contract, Payment, Deadline, Expense, Vehicle } 
 // Questa è ora l'unica fonte di dati per l'intera applicazione.
 
 export const properties: Property[] = [
-  { id: 'imm-001', code: 'IMM-001', name: 'Villa Paradiso', address: 'Via Roma 1, Milano', type: 'Villa', surface: 250, rooms: 7, status: 'Affittato', imageUrl: 'https://images.unsplash.com/photo-15701294774G92-45c003edd2be?q=80&w=2070&auto=format&fit=crop' },
+  { id: 'imm-001', code: 'IMM-001', name: 'Villa Paradiso', address: 'Via Roma 1, Milano', type: 'Villa', surface: 250, rooms: 7, status: 'Affittato', imageUrl: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=2070&auto=format&fit=crop' },
   { id: 'imm-002', code: 'IMM-002', name: 'Appartamento Centrale', address: 'Corso Buenos Aires 10, Milano', type: 'Appartamento', surface: 80, rooms: 3, status: 'Affittato', imageUrl: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop' },
   { id: 'imm-003', code: 'IMM-003', name: 'Ufficio Moderno', address: 'Piazza Duomo 5, Milano', type: 'Ufficio', surface: 120, rooms: 4, status: 'Libero', imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop' },
   { id: 'imm-004', code: 'IMM-004', name: 'Garage Centrale', address: 'Via Montenapoleone 20, Milano', type: 'Garage', surface: 20, rooms: 1, status: 'Libero', imageUrl: 'https://images.unsplash.com/photo-1589331908599-8084a9354d20?q=80&w=2070&auto=format&fit=crop' },

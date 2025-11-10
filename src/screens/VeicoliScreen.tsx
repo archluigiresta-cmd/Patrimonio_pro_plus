@@ -1,16 +1,45 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import type { Vehicle } from '@/types';
 import Card from '@/components/ui/Card';
 import Modal from '@/components/ui/Modal';
 import { vehicles as initialVehicles } from '@/data/store';
+import type { Vehicle } from '@/types';
 
 const VeicoliScreen = () => {
   const [vehicles, setVehicles] = useState(initialVehicles);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newVehicle, setNewVehicle] = useState<Omit<Vehicle, 'id'>>({
+      plate: '',
+      model: '',
+      insuranceCompany: '',
+      insuranceExpiry: '',
+      stampDutyAmount: 0,
+      stampDutyExpiry: '',
+      lastRevision: '',
+      nextRevision: ''
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      setNewVehicle(prev => ({...prev, [name]: name === 'stampDutyAmount' ? parseFloat(value) : value }));
+  }
+
+  const handleAddVehicle = (e: FormEvent) => {
+      e.preventDefault();
+      const newId = `vec-${(Math.random() * 1000).toFixed(0).padStart(3, '0')}`;
+      setVehicles(prev => [...prev, { id: newId, ...newVehicle }]);
+      setIsModalOpen(false);
+      // Reset form
+      setNewVehicle({
+          plate: '', model: '', insuranceCompany: '', insuranceExpiry: '',
+          stampDutyAmount: 0, stampDutyExpiry: '', lastRevision: '', nextRevision: ''
+      });
+  }
 
   const getStatus = (dateString: string) => {
+    if (!dateString) return { text: 'N/D', color: 'text-gray-500' };
     const today = new Date();
+    today.setHours(0,0,0,0);
     const expiryDate = new Date(dateString);
     const diffTime = expiryDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -53,15 +82,15 @@ const VeicoliScreen = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                             <div className={`text-sm font-semibold ${getStatus(vehicle.insuranceExpiry).color}`}>{getStatus(vehicle.insuranceExpiry).text}</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">{new Date(vehicle.insuranceExpiry).toLocaleDateString()}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{vehicle.insuranceExpiry ? new Date(vehicle.insuranceExpiry).toLocaleDateString() : ''}</div>
                         </td>
                          <td className="px-6 py-4 whitespace-nowrap">
                             <div className={`text-sm font-semibold ${getStatus(vehicle.stampDutyExpiry).color}`}>{getStatus(vehicle.stampDutyExpiry).text}</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">{new Date(vehicle.stampDutyExpiry).toLocaleDateString()}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{vehicle.stampDutyExpiry ? new Date(vehicle.stampDutyExpiry).toLocaleDateString() : ''}</div>
                         </td>
                          <td className="px-6 py-4 whitespace-nowrap">
                             <div className={`text-sm font-semibold ${getStatus(vehicle.nextRevision).color}`}>{getStatus(vehicle.nextRevision).text}</div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">{new Date(vehicle.nextRevision).toLocaleDateString()}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">{vehicle.nextRevision ? new Date(vehicle.nextRevision).toLocaleDateString() : ''}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button className="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-200 mr-4"><Edit size={18}/></button>
@@ -74,15 +103,15 @@ const VeicoliScreen = () => {
       </Card>
       
       <Modal title="Aggiungi Nuovo Veicolo" isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <form className="space-y-4">
+        <form onSubmit={handleAddVehicle} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div>
                     <label htmlFor="model" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Modello</label>
-                    <input type="text" name="model" id="model" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Fiat 500" />
+                    <input type="text" name="model" id="model" value={newVehicle.model} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="Es. Fiat 500" required />
                 </div>
                 <div>
                     <label htmlFor="plate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Targa</label>
-                    <input type="text" name="plate" id="plate" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="AB123CD" />
+                    <input type="text" name="plate" id="plate" value={newVehicle.plate} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" placeholder="AB123CD" required />
                 </div>
             </div>
             
@@ -90,11 +119,11 @@ const VeicoliScreen = () => {
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label htmlFor="insuranceCompany" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Compagnia</label>
-                    <input type="text" name="insuranceCompany" id="insuranceCompany" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                    <input type="text" name="insuranceCompany" id="insuranceCompany" value={newVehicle.insuranceCompany} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
                 </div>
                  <div>
                     <label htmlFor="insuranceExpiry" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Scadenza</label>
-                    <input type="date" name="insuranceExpiry" id="insuranceExpiry" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                    <input type="date" name="insuranceExpiry" id="insuranceExpiry" value={newVehicle.insuranceExpiry} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
                 </div>
             </div>
 
@@ -102,11 +131,11 @@ const VeicoliScreen = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label htmlFor="stampDutyAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Importo (€)</label>
-                    <input type="number" name="stampDutyAmount" id="stampDutyAmount" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                    <input type="number" name="stampDutyAmount" id="stampDutyAmount" value={newVehicle.stampDutyAmount} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
                 </div>
                  <div>
                     <label htmlFor="stampDutyExpiry" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Scadenza</label>
-                    <input type="date" name="stampDutyExpiry" id="stampDutyExpiry" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                    <input type="date" name="stampDutyExpiry" id="stampDutyExpiry" value={newVehicle.stampDutyExpiry} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
                 </div>
             </div>
             
@@ -114,11 +143,11 @@ const VeicoliScreen = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label htmlFor="lastRevision" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Ultima</label>
-                    <input type="date" name="lastRevision" id="lastRevision" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                    <input type="date" name="lastRevision" id="lastRevision" value={newVehicle.lastRevision} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
                 </div>
                  <div>
                     <label htmlFor="nextRevision" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Data Prossima</label>
-                    <input type="date" name="nextRevision" id="nextRevision" className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
+                    <input type="date" name="nextRevision" id="nextRevision" value={newVehicle.nextRevision} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm bg-gray-50 dark:bg-gray-700" />
                 </div>
             </div>
 

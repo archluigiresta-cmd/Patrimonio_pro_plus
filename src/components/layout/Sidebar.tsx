@@ -1,7 +1,5 @@
-import { useState } from 'react';
-import { Building, LogOut, ChevronDown, ChevronRight } from 'lucide-react';
+import { Building, ChevronRight } from 'lucide-react';
 import { SIDEBAR_NAV_ITEMS } from '@/config/navigation';
-import type { NavItem } from '@/types';
 
 interface SidebarProps {
   isCollapsed: boolean;

@@ -12,10 +12,10 @@ export const SIDEBAR_NAV_ITEMS: NavItem[] = [
   { id: 'manutenzioni', label: 'Manutenzioni', icon: HardHat, path: '/manutenzioni', type: 'link' },
   { id: 'spese', label: 'Spese', icon: Euro, path: '/spese', type: 'link' },
   { id: 'documenti', label: 'Documenti', icon: FileBox, path: '/documenti', type: 'link' },
-  { id: 'spacer1', label: '', icon: () => null, type: 'spacer' },
+  { id: 'spacer1', label: '', icon: () => <></>, type: 'spacer' },
   { id: 'report', label: 'Report', icon: BarChart2, path: '/report', type: 'link' },
   { id: 'analisi-finanziaria', label: 'Analisi Finanziaria', icon: TrendingUp, path: '/analisi-finanziaria', type: 'link' },
-  { id: 'spacer2', label: '', icon: () => null, type: 'spacer' },
+  { id: 'spacer2', label: '', icon: () => <></>, type: 'spacer' },
   { id: 'impostazioni', label: 'Impostazioni', icon: Settings, path: '/impostazioni', type: 'link' },
   { id: 'aiuto-supporto', label: 'Aiuto & Supporto', icon: LifeBuoy, path: '/aiuto', type: 'link' },
 ];
